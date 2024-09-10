@@ -1,0 +1,154 @@
+#!/bin/bash
+
+# Maksimum ukuran file dalam KB (2000 KB = 2 MB)
+MAX_SIZE=2000
+
+# Fungsi untuk mengonversi byte ke KB
+bytes_to_kb() {
+    echo "$(( $1 / 1024 ))"
+}
+
+# Fungsi untuk mengubah ukuran gambar ke lebar 1080
+resize_to_1080() {
+    local image=$1
+    local output_dir=$2
+
+    local filename=$(basename "$image")
+    local base="${filename%.*}"
+    local extension="${filename##*.}"
+    local new_filename="${output_dir}/${base}-1080.${extension}"
+
+    magick "$image" -resize 1080x "$new_filename" > /dev/null 2>&1
+    echo "$new_filename"
+}
+
+# Fungsi untuk menurunkan kualitas gambar
+compress_image() {
+    local image=$1
+    local output_dir=$2
+
+    local filename=$(basename "$image")
+    local base="${filename%.*}"
+    local extension="${filename##*.}"
+    local new_filename="${output_dir}/${base}-resized.${extension}"
+
+    local quality=85
+
+    while true; do
+        magick "$image" -resize 1080x -quality $quality "$new_filename" > /dev/null 2>&1
+
+        local current_size=$(stat -c%s "$new_filename")
+        local current_size_kb=$(bytes_to_kb $current_size)
+
+        if [ $current_size_kb -le $MAX_SIZE ]; then
+            echo "✔ Resized: '${base}-resized.${extension}' (SIZE: ${current_size_kb} KB)"
+            return
+        fi
+
+        quality=$((quality - 5))
+
+        if [ "$quality" -le 10 ]; then
+            echo "✘ Failed to meet size requirement: '${base}-resized.${extension}' (SIZE: ${current_size_kb} KB)"
+            return
+        fi
+    done
+}
+
+# Fungsi untuk memproses setiap gambar
+process_image() {
+    local image=$1
+    local output_dir=$2
+
+    local filename=$(basename "$image")
+    local base="${filename%.*}"
+    local extension="${filename##*.}"
+
+    # Jika file sudah memiliki suffix -resized, lewati proses
+    if [[ "$filename" =~ -resized\.${extension}$ ]]; then
+        return
+    fi
+
+    # Periksa resolusi gambar
+    local width=$(magick identify -format "%w" "$image")
+    local height=$(magick identify -format "%h" "$image")
+
+    # Jika lebar bukan 1080, ubah ukuran gambar
+    if [ "$width" -ne 1080 ]; then
+        local resized_1080=$(resize_to_1080 "$image" "$output_dir")
+        image="$resized_1080"
+        echo "Resized to 1080 width: '${base}-1080.${extension}'"
+    fi
+
+    # Cek ukuran file
+    local current_size=$(stat -c%s "$image")
+    local current_size_kb=$(bytes_to_kb $current_size)
+
+    if [ $current_size_kb -le $MAX_SIZE ]; then
+        local resized_filename="${output_dir}/${base}-resized.${extension}"
+        cp "$image" "$resized_filename"
+        echo "✔ Completed: '${base}-resized.${extension}' (SIZE: ${current_size_kb} KB)"
+        return
+    fi
+
+    # Jika ukuran file lebih dari batas, lakukan kompresi
+    compress_image "$image" "$output_dir"
+}
+
+# Fungsi untuk menangani interupsi
+cleanup() {
+    echo -e "\nOperation Canceled. Exiting..."
+    exit 1
+}
+
+# Menangani SIGINT (Ctrl+C)
+trap cleanup SIGINT
+
+# Membaca semua nama file dan menyimpannya dalam buffer
+file_list=($(ls *.png 2> /dev/null))
+
+# Jika buffer kosong, tidak ada file yang perlu diproses
+if [ ${#file_list[@]} -eq 0 ]; then
+    echo "No PNG files found in the current directory. Exiting..."
+    exit 1
+fi
+
+# Menyiapkan buffer untuk file yang sudah diproses
+processed_files=()
+
+# Mengisi buffer dengan nama file yang memiliki suffix -resized
+for file in "${file_list[@]}"; do
+    if [[ "$file" =~ -resized\.png$ ]]; then
+        base="${file%-resized.png}"
+        processed_files+=("$base")
+    fi
+done
+
+echo "Starting image resizing process..."
+
+# Proses setiap file PNG di direktori saat ini
+for image in "${file_list[@]}"; do
+    if [ -e "$image" ]; then
+        # Mendapatkan nama dasar file tanpa suffix
+        base="${image%.*}"
+
+        # Periksa jika nama dasar sudah ada dalam buffer processed_files
+        if [[ " ${processed_files[@]} " =~ " ${base} " ]]; then
+            continue
+        fi
+
+        process_image "$image" "$PWD"
+    fi
+done
+
+# Hapus file dengan suffix -1080 setelah file -resized telah dibuat
+for file in *-1080.png; do
+    if [ -e "$file" ]; then
+        base="${file%-1080.png}"
+        if [ -e "${base}-resized.png" ]; then
+            rm "$file"
+            echo "Deleted: '${file}'"
+        fi
+    fi
+done
+
+echo "Resizing process complete."
