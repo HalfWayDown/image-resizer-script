@@ -23,3 +23,14 @@ Skrip ini digunakan untuk mengubah ukuran gambar PNG dalam folder kerja ke lebar
    
    ```bash
    cd path/to/your/folder
+
+2. **Jalankan Skrip**
+   Jalankan skrip dengan menggunakan perintah berikut:
+   ```bash
+   ./resize_images.sh
+   ```
+   
+   Pastikan skrip memiliki izin eksekusi. Jika tidak, ubah izin dengan:
+   ```bash
+   chmod +x resize_images.sh
+   ```
