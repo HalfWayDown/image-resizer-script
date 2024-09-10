@@ -34,3 +34,22 @@ Skrip ini digunakan untuk mengubah ukuran gambar PNG dalam folder kerja ke lebar
    ```bash
    chmod +x resize_images.sh
    ```
+
+**Cara Kerja**
+   1. Resize ke Lebar 1080:
+      Semua gambar PNG dalam folder akan diubah ukurannya jika lebar gambar bukan 1080 piksel, dan disimpan dengan suffix -1080.
+
+   2. Pengecekan Ukuran File:
+      Skrip akan memeriksa ukuran file setelah resizing awal. Jika ukuran file lebih dari 2000 KB, skrip akan menurunkan kualitas gambar secara bertahap sampai ukuran file berada di bawah 2000 KB dan memberikan suffix -resized.
+
+   3. Penghapusan File Sementara:
+      File dengan suffix -1080 akan dihapus setelah file -resized dibuat.
+
+**Menghentikan Proses**
+   Jika Anda perlu menghentikan skrip sebelum selesai, Anda dapat melakukannya dengan menekan Ctrl+C. Skrip akan menampilkan pesan "Operation Canceled. Exiting..." dan berhenti.
+
+**Kontribusi**
+   Jika Anda ingin berkontribusi pada skrip ini, silakan buat pull request atau laporan masalah (issue) di repository ini.
+
+**Lisensi**
+   Skrip ini dilisensikan di bawah MIT License.
