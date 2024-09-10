@@ -46,10 +46,10 @@ Skrip ini digunakan untuk mengubah ukuran gambar PNG dalam folder kerja ke lebar
       File dengan suffix -1080 akan dihapus setelah file -resized dibuat.
 
 **Menghentikan Proses**
-   Jika Anda perlu menghentikan skrip sebelum selesai, Anda dapat melakukannya dengan menekan Ctrl+C. Skrip akan menampilkan pesan "Operation Canceled. Exiting..." dan berhenti.
+      Jika Anda perlu menghentikan skrip sebelum selesai, Anda dapat melakukannya dengan menekan Ctrl+C. Skrip akan menampilkan pesan "Operation Canceled. Exiting..." dan berhenti.
 
 **Kontribusi**
-   Jika Anda ingin berkontribusi pada skrip ini, silakan buat pull request atau laporan masalah (issue) di repository ini.
+      Jika Anda ingin berkontribusi pada skrip ini, silakan buat pull request atau laporan masalah (issue) di repository ini.
 
 **Lisensi**
-   Skrip ini dilisensikan di bawah MIT License.
+      Skrip ini dilisensikan di bawah MIT License.
