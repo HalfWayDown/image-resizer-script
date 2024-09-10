@@ -2,7 +2,7 @@
 
 ## Deskripsi
 
-Skrip ini digunakan untuk mengubah ukuran gambar PNG dalam folder kerja ke lebar maksimum 1080 piksel, memastikan ukuran file akhir tidak melebihi 2000 KB. Skrip ini secara otomatis menangani resizing gambar dan pengurangan kualitas jika diperlukan, serta membersihkan file sementara yang tidak diperlukan setelah proses selesai.
+Skrip ini digunakan untuk mengubah ukuran gambar PNG dalam folder kerja ke lebar maksimum 1080 piksel, memastikan ukuran file akhir tidak melebihi 2000 KB. Skrip ini secara otomatis menangani resizing gambar dan pengurangan kualitas jika diperlukan, serta membersihkan file sementara yang tidak diperlukan setelah proses selesai. Dibuat dengan bantuan chatGPT.
 
 ## Fitur
 
